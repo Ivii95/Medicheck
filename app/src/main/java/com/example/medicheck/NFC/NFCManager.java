@@ -1,4 +1,4 @@
-package com.example.medicheck;
+package com.example.medicheck.NFC;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
@@ -12,6 +12,9 @@ import android.nfc.NfcAdapter;
 import android.nfc.Tag;
 import android.nfc.tech.Ndef;
 import android.nfc.tech.NdefFormatable;
+import android.util.Log;
+
+import com.example.medicheck.MainActivity;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
@@ -28,6 +31,7 @@ public class NFCManager {
     public static PendingIntent pendingIntent;
     public static IntentFilter[] intentFiltersArray;
     public static String[][] techList;
+
     public NFCManager(MainActivity mainActivity) {
 
     }
@@ -70,17 +74,19 @@ public class NFCManager {
     }
 
     public String readTag(Tag tag) {
-        NdefMessage message = null;
+        NdefMessage message;
         try {
             if (tag != null) {
                 Ndef ndefTag = Ndef.get(tag);
                 ndefTag.connect();
+                Log.i("info", ndefTag.getNdefMessage().toString());
                 message = ndefTag.getNdefMessage();
                 ndefTag.close();
                 NdefRecord[] records = message.getRecords();
                 for (NdefRecord ndefRecord : records) {
                     if (ndefRecord.getTnf() == NdefRecord.TNF_WELL_KNOWN && Arrays.equals(ndefRecord.getType(), NdefRecord.RTD_TEXT)) {
                         try {
+                            System.out.println(readText(ndefRecord));
                             return readText(ndefRecord);
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();
