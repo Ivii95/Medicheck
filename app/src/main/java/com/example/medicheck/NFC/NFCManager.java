@@ -2,9 +2,6 @@ package com.example.medicheck.NFC;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.app.Dialog;
-import android.app.PendingIntent;
-import android.content.IntentFilter;
 import android.nfc.FormatException;
 import android.nfc.NdefMessage;
 import android.nfc.NdefRecord;
@@ -15,27 +12,23 @@ import android.nfc.tech.NdefFormatable;
 import android.util.Log;
 
 import com.example.medicheck.MainActivity;
+import com.example.medicheck.data.Avisos;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Locale;
 
+import static com.example.medicheck.MainActivity.lista;
+import static com.example.medicheck.MainActivity.nfcAdpt;
+
 public class NFCManager {
-    public static NfcAdapter nfcAdpt;
-    public static NFCManager mNfcManager;
-    public static Tag mCurrentTag;
-    public static NdefMessage mNfcMessage;
-    public static Dialog mDialog;
-    public static PendingIntent pendingIntent;
-    public static IntentFilter[] intentFiltersArray;
-    public static String[][] techList;
 
     public NFCManager(MainActivity mainActivity) {
 
     }
-
 
     public void verifyNFC(Activity activity) throws NFCNotSupported, NFCNotEnabled {
         nfcAdpt = NfcAdapter.getDefaultAdapter(activity);
@@ -74,19 +67,18 @@ public class NFCManager {
     }
 
     public String readTag(Tag tag) {
-        NdefMessage message;
+        NdefMessage Ndefmessage;
         try {
             if (tag != null) {
                 Ndef ndefTag = Ndef.get(tag);
                 ndefTag.connect();
-                Log.i("info", ndefTag.getNdefMessage().toString());
-                message = ndefTag.getNdefMessage();
+                Log.i("infoNFC", ndefTag.getNdefMessage().toString());
+                Ndefmessage = ndefTag.getNdefMessage();
                 ndefTag.close();
-                NdefRecord[] records = message.getRecords();
+                NdefRecord[] records = Ndefmessage.getRecords();
                 for (NdefRecord ndefRecord : records) {
                     if (ndefRecord.getTnf() == NdefRecord.TNF_WELL_KNOWN && Arrays.equals(ndefRecord.getType(), NdefRecord.RTD_TEXT)) {
                         try {
-                            System.out.println(readText(ndefRecord));
                             return readText(ndefRecord);
                         } catch (UnsupportedEncodingException e) {
                             e.printStackTrace();

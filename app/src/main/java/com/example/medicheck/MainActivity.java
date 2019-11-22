@@ -4,34 +4,37 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.Dialog;
 import android.app.PendingIntent;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.nfc.NdefMessage;
 import android.nfc.NfcAdapter;
+import android.nfc.Tag;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.medicheck.NFC.NFCManager;
-import com.example.medicheck.R;
 import com.example.medicheck.data.Avisos;
 import com.example.medicheck.data.AvisosAdapter;
 import com.example.medicheck.data.AvisosRepository;
 
 import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
-import java.util.List;
-
-import static com.example.medicheck.NFC.NFCManager.intentFiltersArray;
-import static com.example.medicheck.NFC.NFCManager.mCurrentTag;
-import static com.example.medicheck.NFC.NFCManager.mNfcManager;
-import static com.example.medicheck.NFC.NFCManager.nfcAdpt;
-import static com.example.medicheck.NFC.NFCManager.pendingIntent;
-import static com.example.medicheck.NFC.NFCManager.techList;
 
 public class MainActivity extends AppCompatActivity {
     private RecyclerView reyclerView;
     private AvisosAdapter mAdapter;
+    public static AvisosRepository lista = new AvisosRepository();
+
+    public static NfcAdapter nfcAdpt;
+    public static NFCManager mNfcManager;
+    public static Tag mCurrentTag;
+    public static NdefMessage mNfcMessage;
+    public static Dialog mDialog;
+    public static PendingIntent pendingIntent;
+    public static IntentFilter[] intentFiltersArray;
+    public static String[][] techList;
 
 
     //TextView txt;
@@ -72,10 +75,13 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     protected void onResume() {
+
         super.onResume();
         try {
             mNfcManager.verifyNFC(this);
             Intent nfcIntent = new Intent(this, getClass());
+            setIntent(nfcIntent);
+            loquehacealpasarlatarjeta(nfcIntent);
             nfcIntent.addFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
             pendingIntent = PendingIntent.getActivity(this, 0, nfcIntent, 0);
         } catch (NFCManager.NFCNotSupported nfcNotSupported) {
@@ -94,26 +100,25 @@ public class MainActivity extends AppCompatActivity {
 
     @Override
     public void onNewIntent(Intent intent) {
+        setIntent(intent);
         loquehacealpasarlatarjeta(intent);
         super.onNewIntent(intent);
     }
 
     private void loquehacealpasarlatarjeta(Intent intent) {
         String action = intent.getAction();
-        if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)) {
+        if (NfcAdapter.ACTION_TAG_DISCOVERED.equals(action)
+                || NfcAdapter.ACTION_TECH_DISCOVERED.equals(action)
+                || NfcAdapter.ACTION_NDEF_DISCOVERED.equals(action)) {
             mCurrentTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
-            String mensaje = mNfcManager.readTag(mCurrentTag);
-            if (mensaje != null) {
+            String recibido = mNfcManager.readTag(mCurrentTag);
+            if (recibido != null) {
                 reyclerView = (RecyclerView) findViewById(R.id.reyclerView);
                 reyclerView.setHasFixedSize(true);
                 reyclerView.setLayoutManager(new LinearLayoutManager(this));
-                List<Avisos> lista = new AvisosRepository().obtenerDatos();
-                lista.add(new Avisos(LocalDateTime.of(LocalDate.now(), LocalTime.now())
-                        , "mensaje"));
-                mAdapter = new AvisosAdapter(new AvisosRepository().obtenerDatos());
+                lista.insert(new Avisos(LocalDate.now(),recibido));
+                mAdapter = new AvisosAdapter(lista.obtenerDatos());
                 reyclerView.setAdapter(mAdapter);
-                //txt.setText(mensaje);
-                //txt.setText(mensaje);
             }
         }
     }

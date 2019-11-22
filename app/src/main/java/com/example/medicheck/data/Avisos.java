@@ -1,26 +1,37 @@
 package com.example.medicheck.data;
 
-import java.time.LocalDateTime;
+import java.time.LocalDate;
+import java.time.LocalTime;
 
 public class Avisos {
-    LocalDateTime diaHora;
+    int id;
+    LocalDate añoMesDia;
     String farmaco;
 
-    public Avisos(LocalDateTime diaHora, String farmaco) {
-        this.diaHora = diaHora;
+    public Avisos(LocalDate añoMesDia, String farmaco) {
+        this.añoMesDia = añoMesDia;
         this.farmaco = farmaco;
     }
 
     public Avisos() {
     }
 
-    public LocalDateTime getDiaHora() {
-        return diaHora;
+    public int getId() {
+        return id;
     }
 
-    public void setDiaHora(LocalDateTime diaHora) {
-        this.diaHora = diaHora;
+    public void setId(int id) {
+        this.id = id;
     }
+
+    public LocalDate getAñoMesDia() {
+        return añoMesDia;
+    }
+
+    public void setAñoMesDia(LocalDate añoMesDia) {
+        this.añoMesDia = añoMesDia;
+    }
+
 
     public String getFarmaco() {
         return farmaco;

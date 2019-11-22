@@ -1,5 +1,6 @@
 package com.example.medicheck.data;
 
+import android.annotation.SuppressLint;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,12 +27,13 @@ public class AvisosAdapter extends RecyclerView.Adapter<AvisosAdapter.ViewHolder
         return viewHolder;
     }
 
+    @SuppressLint("SetTextI18n")
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
         String farmaco = avisosList.get(position).getFarmaco();
-        String diaHora = avisosList.get(position).getDiaHora().toString();
-        holder.diaHora.setText(holder.diaHora.getText()+" "+diaHora);
-        holder.farmaco.setText(holder.farmaco.getText()+" "+farmaco);
+        String dia = avisosList.get(position).getAñoMesDia().toString();
+        holder.diaHora.setText(holder.diaHora.getText() + " " + dia);
+        holder.farmaco.setText(holder.farmaco.getText() + " " + farmaco);
 
     }
 
