@@ -12,16 +12,12 @@ import android.nfc.tech.NdefFormatable;
 import android.util.Log;
 
 import com.example.medicheck.MainActivity;
-import com.example.medicheck.data.Avisos;
-
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Locale;
 
-import static com.example.medicheck.MainActivity.lista;
 import static com.example.medicheck.MainActivity.nfcAdpt;
 
 public class NFCManager {
@@ -37,7 +33,6 @@ public class NFCManager {
         if (!nfcAdpt.isEnabled())
             throw new NFCNotEnabled();
     }
-
     @SuppressLint("MissingPermission")
     public void disableDispatch(Activity activity) {
         nfcAdpt.disableForegroundDispatch(activity);
@@ -72,7 +67,6 @@ public class NFCManager {
             if (tag != null) {
                 Ndef ndefTag = Ndef.get(tag);
                 ndefTag.connect();
-                Log.i("infoNFC", ndefTag.getNdefMessage().toString());
                 Ndefmessage = ndefTag.getNdefMessage();
                 ndefTag.close();
                 NdefRecord[] records = Ndefmessage.getRecords();
@@ -86,9 +80,7 @@ public class NFCManager {
                     }
                 }
             }
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (FormatException e) {
+        } catch (IOException | FormatException e) {
             e.printStackTrace();
         }
         return null;
