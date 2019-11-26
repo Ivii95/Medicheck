@@ -1,6 +1,5 @@
 package com.example.medicheck.data;
 
-import android.app.Activity;
 import android.content.Context;
 import android.widget.Toast;
 
@@ -9,7 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class AvisosRepository {
-    List<Avisos> listaAvisos;
+    static List<Avisos> listaAvisos;
     Database datos;
 
     public AvisosRepository(Context context) {
@@ -19,32 +18,32 @@ public class AvisosRepository {
         //datos.agregar(new Avisos(LocalDate.of(2019, 11, 11), "Paracetamol"));
         listaAvisos.add(new Avisos(LocalDate.of(2019, 11, 11), "Paracetamol"));
         listaAvisos.add(new Avisos(LocalDate.of(2019, 8, 11), "asd"));
-        listaAvisos.add(new Avisos(LocalDate.of(2019, 12, 11), "omperazol"));
+        listaAvisos.add(new Avisos(LocalDate.of(2019, 12, 11), "Omeprazol"));
         listaAvisos.add(new Avisos(LocalDate.of(2019, 9, 11), "qwerty"));
         listaAvisos.add(new Avisos(LocalDate.of(2019, 9, 11), "aaaaaa"));
         guardarDatos();
+        int borrados = 0;
         int mesActual = LocalDate.now().getMonthValue();
-        int diaActual=  LocalDate.now().getDayOfMonth();
-        int borrados=0;
+        int diaActual = LocalDate.now().getDayOfMonth();
         for (int i = 0; i < listaAvisos.size(); i++) {
             int mes = listaAvisos.get(i).getAñoMesDia().getMonthValue();
             int dia = listaAvisos.get(i).getAñoMesDia().getDayOfMonth();
             if (mes < mesActual - 1) {
                 borrados++;
-                Toast.makeText(context,"Total borrados por antiguedad: "+borrados, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Total borrados por antiguedad: " + borrados, Toast.LENGTH_SHORT).show();
                 listaAvisos.remove(i);
                 i--;
             } else if (mes == 11 && mesActual == 1) {
                 borrados++;
-                Toast.makeText(context, "Total borrados por antiguedad: "+borrados, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Total borrados por antiguedad: " + borrados, Toast.LENGTH_SHORT).show();
                 listaAvisos.remove(i);
                 i--;
             } else if (mes == 12 && mesActual == 2) {
                 borrados++;
-                Toast.makeText(context, "Total borrados por antiguedad: "+borrados, Toast.LENGTH_SHORT).show();
+                Toast.makeText(context, "Total borrados por antiguedad: " + borrados, Toast.LENGTH_SHORT).show();
                 listaAvisos.remove(i);
                 i--;
-            }else if (mes ==mesActual && dia==diaActual){
+            } else if (mes == mesActual && dia == diaActual) {
 
             }
         }
@@ -53,7 +52,7 @@ public class AvisosRepository {
 
     public void guardarDatos() {
         for (Avisos avi : listaAvisos) {
-            datos.agregar(avi);
+            // datos.agregar(avi);
         }
     }
 
@@ -68,7 +67,7 @@ public class AvisosRepository {
     public void insert(Avisos aviso) {
         boolean esta = false;
         for (Avisos avi : listaAvisos) {
-            if (aviso.farmaco.equals(avi.farmaco) && aviso.añoMesDia.equals(avi.añoMesDia)) {
+            if (aviso.farmaco.equals(avi.farmaco) && aviso.añoMesDia.equals(avi.añoMesDia) && !esta) {
                 esta = true;
             }
         }
@@ -76,7 +75,21 @@ public class AvisosRepository {
             listaAvisos.add(0, aviso);
             datos.agregar(aviso);
         }
-
         //listaAvisos=obtenerDatosBD();
+    }
+
+    public static Avisos comprobarFecha() {
+        Avisos aviso = null;
+        int mesActual = LocalDate.now().getMonthValue();
+        int diaActual = LocalDate.now().getDayOfMonth();
+        for (int i = 0; i < listaAvisos.size(); i++) {
+            int mes = listaAvisos.get(i).getAñoMesDia().getMonthValue();
+            int dia = listaAvisos.get(i).getAñoMesDia().getDayOfMonth();
+            if (dia == diaActual && mes == mesActual) {
+                aviso = listaAvisos.get(i);
+                listaAvisos.remove(aviso);
+            }
+        }
+        return aviso;
     }
 }
