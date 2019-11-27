@@ -7,8 +7,12 @@
     <dist:module dist:instant="true" />
 
     <uses-permission android:name="android.permission.NFC" />
-    <uses-permission android:name="android.permission.NFC_TRANSACTION_EVENT"/>
+    <uses-permission android:name="android.permission.NFC_TRANSACTION_EVENT" />
+
     <uses-feature android:name="android.hardware.nfc" />
+
+    <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <!--<uses-permission android:name="android.permission.INTERNET" />-->
     <application
         android:allowBackup="true"
@@ -28,7 +32,5 @@
                 <category android:name="android.intent.category.DEFAULT" />
             </intent-filter>
         </activity>
-        <activity android:name=".ComprobarFechas" />
     </application>
-
 </manifest>

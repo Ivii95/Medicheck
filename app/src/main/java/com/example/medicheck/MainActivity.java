@@ -11,7 +11,6 @@ import android.app.Dialog;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.nfc.NdefMessage;
@@ -37,8 +36,8 @@ public class MainActivity extends AppCompatActivity {
     private NotificationManager mNotifyMgr;
     private String CHANNEL_ID = "abc";
 
-    private RecyclerView reyclerView;
-    private AvisosAdapter mAdapter;
+    public static RecyclerView reyclerView;
+    public static AvisosAdapter mAdapter;
     public AvisosRepository repositorio;
 
     public static NfcAdapter nfcAdpt;
@@ -51,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
     public static IntentFilter[] intentFiltersArray;
     public static String[][] techList;
 
+    //Database db;
     Usuario user;
     TextView txt;
 
@@ -58,7 +58,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
         iniciarUI();
         nfcTools();
     }
@@ -91,13 +90,14 @@ public class MainActivity extends AppCompatActivity {
         user = new Usuario(11, "Pablo", "Lorenzo", "Gutierrez");
         txt = (TextView) findViewById(R.id.textView);
         txt.setText(user.getNombre() + " " + user.getApellido1() + " " + user.getApellido2());
+
         repositorio = new AvisosRepository(this);
         reyclerView = (RecyclerView) findViewById(R.id.reyclerView);
         // use this setting to improve performance if you know that changes
         // in content do not change the layout size of the RecyclerView
         reyclerView.setHasFixedSize(true);
         reyclerView.setLayoutManager(new LinearLayoutManager(this));
-        mAdapter = new AvisosAdapter(repositorio.obtenerDatos());
+        mAdapter = new AvisosAdapter(this, repositorio);
         reyclerView.setAdapter(mAdapter);
 
     }
@@ -184,13 +184,11 @@ public class MainActivity extends AppCompatActivity {
     protected void onPause() {
         super.onPause();
         mNfcManager.disableDispatch(this);
-        repositorio.guardarDatos();
     }
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        repositorio.guardarDatos();
         iniciarHilo();
     }
 
@@ -239,9 +237,6 @@ public class MainActivity extends AppCompatActivity {
             mCurrentTag = intent.getParcelableExtra(NfcAdapter.EXTRA_TAG);
             String recibido = mNfcManager.readTag(mCurrentTag);
             if (recibido != null) {
-                reyclerView = (RecyclerView) findViewById(R.id.reyclerView);
-                reyclerView.setHasFixedSize(true);
-                reyclerView.setLayoutManager(new LinearLayoutManager(this));
                 ArrayList<Avisos> avisos = dividirString(recibido);
                 for (int i = 0; i < avisos.size(); i++) {
                     Avisos aviso = avisos.get(i);
@@ -249,7 +244,10 @@ public class MainActivity extends AppCompatActivity {
                         repositorio.insert(aviso);
                     }
                 }
-                mAdapter = new AvisosAdapter(repositorio.obtenerDatos());
+                reyclerView = (RecyclerView) findViewById(R.id.reyclerView);
+                reyclerView.setHasFixedSize(true);
+                reyclerView.setLayoutManager(new LinearLayoutManager(this));
+                mAdapter = new AvisosAdapter(this, repositorio);
                 reyclerView.setAdapter(mAdapter);
             }
         }
